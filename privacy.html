@@ -132,7 +132,7 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   <div class="divider"></div>
 
   <h2>Contact</h2>
-  <p>Questions about this privacy policy? Email us at <a href="mailto:info@onetenth.ca">info@onetenth.ca</a></p>
+  <p>Questions about this privacy policy? Email us at <a href="#" id="privacy-contact-email">[email&#160;protected]</a></p>
 </div>
 
 <footer>
@@ -142,5 +142,12 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   </div>
   <a href="index.html" class="footer-link">Home</a>
 </footer>
+<script>
+(function(){
+  var u='info',d='onetenth'+'.'+'ca';
+  var el=document.getElementById('privacy-contact-email');
+  if(el){el.href='mailto:'+u+'@'+d;el.textContent=u+'@'+d;}
+})();
+</script>
 </body>
 </html>

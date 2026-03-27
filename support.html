@@ -154,7 +154,7 @@ h1 em { font-style: italic; color: var(--blue); }
   transition: max-height 0.28s ease, opacity 0.22s ease;
   opacity: 0;
 }
-.faq-item.open .faq-a { opacity: 1; }
+.faq-item.open .faq-a { max-height: 800px; opacity: 1; }
 .faq-a-inner {
   padding: 0 20px 20px;
   border-top: 1px solid var(--rule);
@@ -445,11 +445,23 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 // Accordion logic
 document.querySelectorAll('.faq-item').forEach(item => {
   const btn = item.querySelector('.faq-q');
-  const body = item.querySelector('.faq-a');
 
   btn.addEventListener('click', () => {
     const isOpen = item.classList.contains('open');
 
-    // Close all
+    // Close all open items
     document.querySelectorAll('.faq-item.open').forEach(open => {
-      open
+      open.classList.remove('open');
+      open.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+    });
+
+    // Open this one if it was closed
+    if (!isOpen) {
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+</script>
+</body>
+</html>
