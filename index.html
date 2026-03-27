@@ -620,4 +620,17 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   <div class="footer-links">
     <a href="support.html" class="footer-link">Support</a>
     <a href="privacy.html" class="footer-link">Privacy Policy</a>
-    <a href="/cdn-cgi/l/email-protection#b9d0d7dfd6f9d6d7dccddcd7cd
+   <a href="#" id="footer-contact-link" class="footer-link">Contact</a>
+  </div>
+</footer>
+<script>
+(function(){
+  var e=String.fromCharCode(105,110,102,111,64,111,110,101,116,101,110,116,104,46,99,97);
+  ['nav-contact-link','footer-contact-link'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.href='mailto:'+e;}
+  });
+})();
+</script>
+</body>
+</html>
