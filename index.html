@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneTenth — Billable Hours Tracker for Lawyers</title>
 <meta name="description" content="A billable hours tracker for lawyers. Log time in tenths, track your pace against your annual target, and keep every entry on your phone. $9.99 once. No account.">
-<meta name="theme-color" content="#F2F2F7">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F6F8">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0E15">
 <meta name="apple-mobile-web-app-title" content="OneTenth">
 <link rel="canonical" href="https://onetenth.ca/">
 
-<!-- Favicons -->
-<link rel="icon" type="image/png" href="IMG_1098.PNG">
-<link rel="apple-touch-icon" sizes="180x180" href="IMG_1098.PNG">
+<!-- Favicons — the Tenth Ring app icon -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="touch-icon.png">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -21,7 +22,7 @@
 <meta property="og:url" content="https://onetenth.ca/">
 <meta property="og:locale" content="en_CA">
 <!-- TODO: replace og:image with a proper 1200x630 social card. Falling back to the 1024x1024 app icon for now — renders as a square crop in iMessage/Slack/Twitter previews. -->
-<meta property="og:image" content="https://onetenth.ca/IMG_1098.PNG">
+<meta property="og:image" content="https://onetenth.ca/app-icon.png">
 <meta property="og:image:width" content="1024">
 <meta property="og:image:height" content="1024">
 <meta property="og:image:alt" content="OneTenth app icon">
@@ -30,36 +31,96 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="OneTenth — Billable Hours Tracker for Lawyers">
 <meta name="twitter:description" content="Log billable hours in tenths and always know where you stand against your target. $9.99 once. No account.">
-<meta name="twitter:image" content="https://onetenth.ca/IMG_1098.PNG">
+<meta name="twitter:image" content="https://onetenth.ca/app-icon.png">
 <meta name="twitter:image:alt" content="OneTenth app icon">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ─── "TENTHS" DESIGN TOKENS ──────────────────────────────
+   Mirrors the app's DesignTokens.swift: blue-biased neutrals,
+   one cobalt accent, semantic color reserved for money-meaning.
+   Dark mode is designed, not inverted — surfaces get lighter
+   as they rise off the ground. Type is the app's: New York
+   serif for mastheads, SF for everything else.              */
 :root {
-  --bg:            #F2F2F7;
-  --surface:       #FFFFFF;
-  --ink:           #1C1C1E;
-  --ink-2:         #3A3A3C;
-  --ink-3:         #636366;
-  --muted:         #8E8E93;
-  --rule:          rgba(60,60,67,0.12);
-  --rule-mid:      rgba(60,60,67,0.18);
-  --blue:          #007AFF;
-  --blue-hover:    #0066DD;
-  --blue-dim:      rgba(0,122,255,0.09);
-  --blue-glow:     rgba(0,122,255,0.14);
-  --green:         #34C759;
-  --green-dim:     rgba(52,199,89,0.10);
-  --green-border:  rgba(52,199,89,0.25);
-  --orange:        #FF9500;
-  --orange-dim:    rgba(255,149,0,0.10);
-  --navy:          #101620;
-  --serif:         'Instrument Serif', Georgia, serif;
-  --sans:          'DM Sans', sans-serif;
-  --mono:          'DM Mono', monospace;
+  color-scheme: light dark;
+
+  --bg:            #F5F6F8;   /* ground */
+  --surface:       #FFFFFF;   /* cards & sheets */
+  --well:          #ECEEF3;   /* inner wells: chips, tracks */
+  --ink:           #101623;   /* near-black navy, not pure black */
+  --ink-2:         #333B52;
+  --ink-3:         #5A6376;   /* blue-gray, not neutral gray */
+  --muted:         #8A91A4;
+  --rule:          #E6E8EE;   /* hairline */
+  --rule-mid:      #D9DCE5;
+
+  --cobalt:        #2450D8;   /* the one accent */
+  --cobalt-hover:  #1E44BA;
+  --cobalt-dim:    rgba(36,80,216,0.10);
+  --cobalt-glow:   rgba(36,80,216,0.16);
+  --cta-text:      #FFFFFF;
+
+  --green:         #1F8A5B;   /* ahead of target */
+  --green-dim:     rgba(31,138,91,0.12);
+  --green-border:  rgba(31,138,91,0.30);
+  --red:           #C43D3D;   /* behind target */
+  --amber:         #B57514;   /* recalculated targets */
+  --amber-dim:     rgba(181,117,20,0.12);
+
+  /* on-dark panels (showcase, CTA) use the designed dark-ground tokens */
+  --panel:         #0B0E15;
+  --panel-border:  transparent;
+  --on-panel-accent: rgba(114,144,255,0.9);
+
+  --nav-bg:        rgba(245,246,248,0.82);
+  --grid-line:     rgba(16,22,35,0.05);
+  --pill-bg:       rgba(255,255,255,0.55);
+  --detail-hover:  #EDF1FC;
+  --metrics-bg:    rgba(255,255,255,0.7);
+  --canvas-glow-1: rgba(36,80,216,0.05);
+  --canvas-glow-2: rgba(36,80,216,0.03);
+
+  --serif:         ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  --sans:          -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono:          ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:            #0B0E15;
+    --surface:       #141928;
+    --well:          #1E2537;
+    --ink:           #EDEFF4;
+    --ink-2:         #C2C8D6;
+    --ink-3:         #99A1B5;
+    --muted:         #6E7690;
+    --rule:          #202741;
+    --rule-mid:      #2A3355;
+
+    --cobalt:        #7290FF;  /* brightened two steps to hold contrast */
+    --cobalt-hover:  #8CA4FF;
+    --cobalt-dim:    rgba(114,144,255,0.14);
+    --cobalt-glow:   rgba(114,144,255,0.22);
+    --cta-text:      #0B0E15;
+
+    --green:         #46BD8B;
+    --green-dim:     rgba(70,189,139,0.15);
+    --green-border:  rgba(70,189,139,0.32);
+    --red:           #E06C6C;
+    --amber:         #DDA45B;
+    --amber-dim:     rgba(221,164,91,0.14);
+
+    --panel:         #10141F;  /* a step above ground so panels still read */
+    --panel-border:  #202741;
+
+    --nav-bg:        rgba(11,14,21,0.78);
+    --grid-line:     rgba(237,239,244,0.035);
+    --pill-bg:       rgba(20,25,40,0.55);
+    --detail-hover:  #1E2537;
+    --metrics-bg:    rgba(20,25,40,0.6);
+    --canvas-glow-1: rgba(114,144,255,0.06);
+    --canvas-glow-2: rgba(114,144,255,0.03);
+  }
 }
 
 html { scroll-behavior: smooth; }
@@ -72,19 +133,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Tenth-ring eyebrow mark: ten segments, the app's signature */
+.ring-mark { width: 13px; height: 13px; flex-shrink: 0; display: block; }
+
 /* ─── FIXED BACKGROUND LAYERS ─────────────────────────── */
 .bg-canvas {
   position: fixed; inset: 0; z-index: -2;
   background:
-    radial-gradient(ellipse 75% 55% at 68% 20%, rgba(0,122,255,0.055) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 65% at 10% 75%, rgba(0,122,255,0.03) 0%, transparent 55%),
+    radial-gradient(ellipse 75% 55% at 68% 20%, var(--canvas-glow-1) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 65% at 10% 75%, var(--canvas-glow-2) 0%, transparent 55%),
     var(--bg);
 }
 .bg-grid {
   position: fixed; inset: 0; z-index: -1;
   background-image:
-    linear-gradient(rgba(60,60,67,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(60,60,67,0.05) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 110% 55% at 50% 0%, black 0%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse 110% 55% at 50% 0%, black 0%, transparent 70%);
@@ -95,7 +159,7 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   padding: 0 52px; height: 62px;
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(242,242,247,0.82);
+  background: var(--nav-bg);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border-bottom: 1px solid var(--rule);
@@ -112,14 +176,14 @@ nav {
 .nav-link:hover { color: var(--ink); }
 .nav-cta {
   display: inline-flex; align-items: center; gap: 7px;
-  font-size: 13.5px; font-weight: 500; color: #fff; text-decoration: none;
-  background: var(--blue); padding: 9px 18px; border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0,122,255,0.3), 0 1px 2px rgba(0,0,0,0.08);
+  font-size: 13.5px; font-weight: 500; color: var(--cta-text); text-decoration: none;
+  background: var(--cobalt); padding: 9px 18px; border-radius: 20px;
+  box-shadow: 0 2px 8px var(--cobalt-glow), 0 1px 2px rgba(0,0,0,0.08);
   transition: background 0.16s, transform 0.13s, box-shadow 0.16s;
 }
 .nav-cta:hover {
-  background: var(--blue-hover); transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,122,255,0.4), 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--cobalt-hover); transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--cobalt-glow), 0 2px 4px rgba(0,0,0,0.1);
 }
 .nav-cta svg { width: 13px; height: 13px; }
 
@@ -136,21 +200,20 @@ nav {
 }
 .hero-left { display: flex; flex-direction: column; justify-content: center; }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex; align-items: center; gap: 9px;
   font-family: var(--mono); font-size: 10.5px;
-  color: var(--blue); letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--cobalt); letter-spacing: 1.8px; text-transform: uppercase;
   margin-bottom: 22px;
   opacity: 0; animation: fadeUp 0.45s 0.05s ease forwards;
 }
-.eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 h1.hero-title {
   font-family: var(--serif);
-  font-size: clamp(44px, 4.8vw, 66px);
-  font-weight: 400; line-height: 1.04;
-  letter-spacing: -2.2px; margin-bottom: 22px; color: var(--ink);
+  font-size: clamp(42px, 4.6vw, 62px);
+  font-weight: 400; line-height: 1.06;
+  letter-spacing: -1.2px; margin-bottom: 22px; color: var(--ink);
   opacity: 0; animation: fadeUp 0.5s 0.12s ease forwards;
 }
-h1.hero-title em { font-style: italic; color: var(--blue); }
+h1.hero-title em { font-style: italic; color: var(--cobalt); }
 .hero-sub {
   font-size: 16.5px; font-weight: 300; line-height: 1.72;
   color: var(--ink-3); max-width: 420px; margin-bottom: 38px;
@@ -169,7 +232,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 }
 .app-store-badge img { display: block; height: auto; }
 .app-store-badge:hover { transform: translateY(-2px); opacity: 0.92; }
-.app-store-badge:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+.app-store-badge:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 4px; }
 .app-store-badge--hero img { width: 180px; }
 .app-store-badge--cta  img { width: 200px; }
 .hero-note { font-size: 12px; color: var(--muted); font-weight: 300; margin-top: 16px; letter-spacing: 0.1px; }
@@ -179,7 +242,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
   display: inline-flex; align-items: center; gap: 10px;
   margin-top: 22px; padding: 9px 16px 9px 14px;
   border: 1px solid var(--rule-mid);
-  background: rgba(255,255,255,0.55);
+  background: var(--pill-bg);
   border-radius: 999px;
   font-family: var(--mono);
   font-size: 11.5px; line-height: 1.2;
@@ -192,7 +255,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 .value-pill-dot {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--green); flex-shrink: 0;
-  box-shadow: 0 0 0 3px rgba(52,199,89,0.16);
+  box-shadow: 0 0 0 3px var(--green-dim);
 }
 
 /* "Built by a lawyer" trust line — small italic byline under the value pill. */
@@ -217,8 +280,8 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 .phone-back {
   position: absolute; top: 32px; left: -28px;
   width: 248px; transform: rotate(-7deg);
-  border-radius: 44px; border: 10px solid #1C1C1E;
-  overflow: hidden; background: #1C1C1E; opacity: 0.68;
+  border-radius: 44px; border: 10px solid #10141F;
+  overflow: hidden; background: #10141F; opacity: 0.68;
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.1),
     0 24px 56px rgba(0,0,0,0.22),
@@ -227,7 +290,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 .phone-back img { display: block; width: 100%; height: auto; border-radius: 34px; }
 .phone-front {
   position: absolute; top: 0; right: 0; width: 272px;
-  border-radius: 46px; border: 11px solid #1C1C1E; overflow: hidden; background: #1C1C1E;
+  border-radius: 46px; border: 11px solid #10141F; overflow: hidden; background: #10141F;
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.12),
     0 40px 80px rgba(0,0,0,0.26),
@@ -247,17 +310,14 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
   font-family: var(--mono); font-size: 11px; padding: 6px 12px;
   border-radius: 20px; white-space: nowrap; letter-spacing: 0.1px;
 }
-.badge-green  { background: var(--green-dim);  color: #1a7a36; }
-.badge-blue   { background: var(--blue-dim);   color: #0055cc; }
-.badge-orange { background: var(--orange-dim); color: #a05c00; }
-.bdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.badge-green  .bdot { background: var(--green);  }
-.badge-blue   .bdot { background: var(--blue);   }
-.badge-orange .bdot { background: var(--orange); }
+.badge-green  { background: var(--green-dim);  color: var(--green); }
+.badge-blue   { background: var(--cobalt-dim); color: var(--cobalt); }
+.badge-amber  { background: var(--amber-dim);  color: var(--amber); }
+.bdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: currentColor; }
 
 /* ─── METRICS — semi-transparent wash ────────────────── */
 .metrics-section {
-  background: rgba(255,255,255,0.7);
+  background: var(--metrics-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--rule);
@@ -267,42 +327,42 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 .metric:first-child { padding-left: 0; }
 .metric:last-child { border-right: none; padding-right: 0; }
 .metric-num {
-  font-family: var(--serif); font-size: 52px; font-weight: 400;
-  color: var(--blue); letter-spacing: -2.5px;
+  font-family: var(--serif); font-size: 50px; font-weight: 400;
+  color: var(--cobalt); letter-spacing: -1.4px;
   display: block; margin-bottom: 10px; line-height: 1;
 }
 .metric-label { font-size: 13px; font-weight: 300; color: var(--ink-3); line-height: 1.5; }
 
 /* ─── SHARED EYEBROW ──────────────────────────────────── */
 .eyebrow {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 9px;
   font-family: var(--mono); font-size: 10.5px;
-  color: var(--blue); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 16px;
+  color: var(--cobalt); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 16px;
 }
-.epip { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
-.section-title { font-family: var(--serif); font-size: clamp(30px,3.6vw,46px); font-weight: 400; letter-spacing: -1.3px; color: var(--ink); line-height: 1.1; max-width: 520px; }
-.section-title em { font-style: italic; color: var(--blue); }
+.section-title { font-family: var(--serif); font-size: clamp(29px,3.4vw,43px); font-weight: 400; letter-spacing: -0.7px; color: var(--ink); line-height: 1.12; max-width: 520px; }
+.section-title em { font-style: italic; color: var(--cobalt); }
 
 /* ─── FEATURES ────────────────────────────────────────── */
 .features { padding: 108px 52px; max-width: 1200px; margin: 0 auto; }
 .features-header { margin-bottom: 52px; }
 .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+/* The one card treatment: surface fill, hairline border, soft key shadow */
 .feature-card {
   background: var(--surface);
   border-radius: 16px; padding: 32px 28px;
   border: 1px solid var(--rule);
   position: relative; overflow: hidden;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
 }
 /* subtle top-edge highlight */
 .feature-card::before {
   content: '';
   position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.18), transparent);
+  background: linear-gradient(90deg, transparent, var(--cobalt-glow), transparent);
 }
 .feature-card:hover {
-  border-color: rgba(0,122,255,0.22);
+  border-color: var(--cobalt-glow);
   box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   transform: translateY(-2px);
 }
@@ -310,23 +370,40 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
    six-minute = 0.1h is the unit lawyers bill in. The motif reuses an element
    the design already had instead of layering a new decoration on top. */
 .feature-num { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.8px; margin-bottom: 22px; display: block; }
-.feature-icon { width: 42px; height: 42px; background: var(--blue-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--blue); margin-bottom: 16px; }
+.feature-icon { width: 42px; height: 42px; background: var(--cobalt-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--cobalt); margin-bottom: 16px; }
 .feature-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.2px; }
 .feature-desc { font-size: 13px; font-weight: 300; color: var(--ink-3); line-height: 1.68; }
 
+/* "New in 2.0" strip — the rebrand release's marquee additions */
+.v2-strip {
+  margin-top: 14px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 16px;
+  padding: 20px 28px;
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.v2-label {
+  font-family: var(--mono); font-size: 10.5px; color: var(--cobalt);
+  letter-spacing: 1.8px; text-transform: uppercase; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 9px;
+}
+.v2-items { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.v2-item { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); }
+.v2-item svg { width: 15px; height: 15px; color: var(--cobalt); flex-shrink: 0; }
+
 /* ─── SHOWCASE ────────────────────────────────────────── */
-.showcase { background: var(--navy); padding: 108px 52px; overflow: hidden; }
+.showcase { background: var(--panel); border-top: 1px solid var(--panel-border); border-bottom: 1px solid var(--panel-border); padding: 108px 52px; overflow: hidden; }
 .showcase-inner { max-width: 1200px; margin: 0 auto; }
 .showcase-header { text-align: center; margin-bottom: 60px; }
-.showcase-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10.5px; color: rgba(0,122,255,0.8); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 14px; }
-.showcase-title { font-family: var(--serif); font-size: clamp(28px,3.4vw,44px); font-weight: 400; letter-spacing: -1.3px; color: #fff; line-height: 1.1; }
-.showcase-title em { font-style: italic; color: rgba(0,122,255,0.9); }
+.showcase-eyebrow { display: inline-flex; align-items: center; gap: 9px; font-family: var(--mono); font-size: 10.5px; color: var(--on-panel-accent); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 14px; }
+.showcase-title { font-family: var(--serif); font-size: clamp(28px,3.2vw,42px); font-weight: 400; letter-spacing: -0.7px; color: #EDEFF4; line-height: 1.12; }
+.showcase-title em { font-style: italic; color: var(--on-panel-accent); }
 .screens-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; align-items: end; }
 .screen-item { text-align: center; }
-.screen-label { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; display: block; }
+.screen-label { font-family: var(--mono); font-size: 10px; color: rgba(237,239,244,0.35); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; display: block; }
 .screen-phone {
-  display: inline-block; border-radius: 34px; border: 9px solid #2C2C2E;
-  overflow: hidden; background: #2C2C2E;
+  display: inline-block; border-radius: 34px; border: 9px solid #1E2537;
+  overflow: hidden; background: #1E2537;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 32px 60px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.28);
   transition: transform 0.2s;
 }
@@ -335,10 +412,10 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 
 /* ─── PRIVACY ─────────────────────────────────────────── */
 .privacy { padding: 108px 52px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-.privacy-title { font-family: var(--serif); font-size: clamp(28px,3.2vw,44px); font-weight: 400; letter-spacing: -1.2px; color: var(--ink); margin-bottom: 20px; line-height: 1.1; }
-.privacy-title em { font-style: italic; color: var(--blue); }
+.privacy-title { font-family: var(--serif); font-size: clamp(28px,3.0vw,42px); font-weight: 400; letter-spacing: -0.7px; color: var(--ink); margin-bottom: 20px; line-height: 1.12; }
+.privacy-title em { font-style: italic; color: var(--cobalt); }
 .privacy-text { font-size: 14.5px; font-weight: 300; color: var(--ink-3); line-height: 1.78; margin-bottom: 14px; }
-.privacy-link { font-size: 13px; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; transition: gap 0.16s; }
+.privacy-link { font-size: 13px; color: var(--cobalt); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; transition: gap 0.16s; }
 .privacy-link:hover { gap: 8px; }
 .pills { display: flex; flex-direction: column; gap: 10px; }
 .pill {
@@ -348,7 +425,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
   transition: border-color 0.16s, box-shadow 0.18s, transform 0.18s;
 }
 .pill:hover {
-  border-color: rgba(0,122,255,0.25);
+  border-color: var(--cobalt-glow);
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   transform: translateX(3px);
 }
@@ -367,7 +444,7 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
 .for-legal-box::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, var(--blue) 30%, var(--blue) 70%, transparent);
+  background: linear-gradient(90deg, transparent, var(--cobalt) 30%, var(--cobalt) 70%, transparent);
   opacity: 0.55;
 }
 /* corner ambient glow */
@@ -375,11 +452,12 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
   content: '';
   position: absolute; top: -60px; right: -60px;
   width: 320px; height: 320px;
-  background: radial-gradient(circle, rgba(0,122,255,0.07) 0%, transparent 65%);
+  background: radial-gradient(circle, var(--cobalt-dim) 0%, transparent 65%);
+  opacity: 0.7;
   pointer-events: none;
 }
-.legal-eyebrow { font-family: var(--mono); font-size: 10.5px; color: var(--blue); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 14px; display: block; }
-.legal-title { font-family: var(--serif); font-size: 31px; font-weight: 400; letter-spacing: -1px; color: var(--ink); line-height: 1.12; margin-bottom: 16px; }
+.legal-eyebrow { font-family: var(--mono); font-size: 10.5px; color: var(--cobalt); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 14px; display: block; }
+.legal-title { font-family: var(--serif); font-size: 30px; font-weight: 400; letter-spacing: -0.5px; color: var(--ink); line-height: 1.16; margin-bottom: 16px; }
 .legal-desc { font-size: 14px; font-weight: 300; color: var(--ink-3); line-height: 1.75; }
 .legal-details { display: flex; flex-direction: column; gap: 12px; }
 .legal-detail {
@@ -389,25 +467,25 @@ h1.hero-title em { font-style: italic; color: var(--blue); }
   transition: border-color 0.16s, background 0.16s, box-shadow 0.18s, transform 0.18s;
   position: relative; z-index: 1;
 }
-.legal-detail:hover { border-color: rgba(0,122,255,0.22); background: #eef4ff; transform: translateX(3px); }
-.detail-icon { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; color: var(--blue); display: flex; align-items: center; justify-content: center; }
+.legal-detail:hover { border-color: var(--cobalt-glow); background: var(--detail-hover); transform: translateX(3px); }
+.detail-icon { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; color: var(--cobalt); display: flex; align-items: center; justify-content: center; }
 .detail-title { font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
 .detail-desc { font-size: 12.5px; font-weight: 300; color: var(--ink-3); line-height: 1.62; }
 
 /* ─── CTA ─────────────────────────────────────────────── */
 .cta-wrap { padding: 0 52px 108px; max-width: 1200px; margin: 0 auto; }
 .cta-box {
-  background: var(--navy); border-radius: 24px; padding: 76px 56px;
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 24px; padding: 76px 56px;
   text-align: center; position: relative; overflow: hidden;
 }
-.cta-box::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,122,255,0.13) 0%, transparent 65%); pointer-events: none; }
+.cta-box::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(114,144,255,0.12) 0%, transparent 65%); pointer-events: none; }
 .cta-icon { display: flex; justify-content: center; margin-bottom: 28px; position: relative; z-index: 1; }
 .cta-app-icon { width: 72px; height: 72px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3); }
 .cta-app-icon img { width: 100%; height: 100%; display: block; object-fit: cover; }
-.cta-title { font-family: var(--serif); font-size: clamp(30px,4vw,50px); font-weight: 400; letter-spacing: -1.8px; color: #fff; margin-bottom: 14px; position: relative; z-index: 1; }
-.cta-title em { font-style: italic; color: rgba(0,122,255,0.9); }
-.cta-sub { font-size: 15.5px; font-weight: 300; color: rgba(255,255,255,0.48); margin: 0 auto 38px; max-width: 380px; line-height: 1.65; position: relative; z-index: 1; }
-.cta-footnote { font-size: 12px; color: rgba(255,255,255,0.28); margin-top: 18px; font-family: var(--mono); letter-spacing: 0.3px; position: relative; z-index: 1; }
+.cta-title { font-family: var(--serif); font-size: clamp(30px,3.8vw,48px); font-weight: 400; letter-spacing: -1px; color: #EDEFF4; margin-bottom: 14px; position: relative; z-index: 1; }
+.cta-title em { font-style: italic; color: var(--on-panel-accent); }
+.cta-sub { font-size: 15.5px; font-weight: 300; color: rgba(237,239,244,0.5); margin: 0 auto 38px; max-width: 380px; line-height: 1.65; position: relative; z-index: 1; }
+.cta-footnote { font-size: 12px; color: rgba(237,239,244,0.3); margin-top: 18px; font-family: var(--mono); letter-spacing: 0.3px; position: relative; z-index: 1; }
 .cta-wrap .app-store-badge { position: relative; z-index: 1; }
 
 /* ─── FOOTER ──────────────────────────────────────────── */
@@ -422,7 +500,11 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 .footer-link:hover { color: var(--ink); }
 
 /* ─── ANIMATIONS ──────────────────────────────────────── */
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+/* Entrance mirrors the app's cascadeIn: opacity + 8px rise, staggered */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-eyebrow, h1.hero-title, .hero-sub, .hero-actions, .value-pill, .byline, .hero-right { animation-duration: 0.01s; animation-delay: 0s; }
+}
 
 /* ─── RESPONSIVE ──────────────────────────────────────── */
 @media (max-width: 1024px) {
@@ -439,6 +521,7 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   .metric:last-child { border-bottom: none; }
   .features { padding: 72px 24px; }
   .features-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .v2-strip { flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px 24px; }
   .showcase { padding: 72px 24px; }
   .screens-row { grid-template-columns: repeat(2,1fr); gap: 16px; }
   .privacy { grid-template-columns: 1fr; padding: 72px 24px; gap: 44px; }
@@ -462,9 +545,20 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 <div class="bg-canvas"></div>
 <div class="bg-grid"></div>
 
+<!-- Tenth-ring mark: ten segments around a circle, echoing the app icon.
+     Referenced everywhere an eyebrow needs its pip. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="tenth-ring" viewBox="0 0 14 14">
+      <circle cx="7" cy="7" r="5.2" fill="none" stroke="currentColor" stroke-width="1.7"
+              stroke-dasharray="2.47 0.797" transform="rotate(-90 7 7)"/>
+    </symbol>
+  </defs>
+</svg>
+
 <nav>
   <a href="/" class="nav-logo">
-    <div class="nav-icon"><img src="app-icon-small.png" alt="OneTenth" width="1024" height="1024" decoding="async"></div>
+    <div class="nav-icon"><img src="app-icon.png" alt="OneTenth" width="1024" height="1024" decoding="async"></div>
     <span class="nav-logo-text">OneTenth</span>
   </a>
   <div class="nav-right">
@@ -479,9 +573,9 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow"><span class="eyebrow-dot"></span>Now available on iOS</div>
+    <div class="hero-eyebrow"><svg class="ring-mark"><use href="#tenth-ring"/></svg>Now available on iOS</div>
     <!-- Headline alternatives — pick one and replace the live <h1>.
-         Each preserves the existing line-break pattern (3 lines) and uses <em> for the blue-accent clause.
+         Each preserves the existing line-break pattern (3 lines) and uses <em> for the cobalt-accent clause.
 
          A — SPECIFICITY (concrete, mechanical, anti-feature):
              <h1 class="hero-title">Six minutes.<br>One tap.<br><em>No account.</em></h1>
@@ -516,8 +610,8 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   </div>
   <div class="hero-right">
     <div class="phone-stack">
-      <div class="phone-back"><img src="screenshot_2_monthly.png" alt="Monthly view in OneTenth" width="1284" height="2778" fetchpriority="high" decoding="async"></div>
-      <div class="phone-front"><img src="screenshot_1_dashboard.png" alt="OneTenth dashboard showing billable hours" width="1284" height="2778" fetchpriority="high" decoding="async"></div>
+      <div class="phone-back"><img src="screenshot_2_monthly.png" alt="Monthly view in OneTenth" width="1206" height="2622" fetchpriority="high" decoding="async"></div>
+      <div class="phone-front"><img src="screenshot_1_dashboard.png" alt="OneTenth dashboard showing billable hours" width="1206" height="2622" fetchpriority="high" decoding="async"></div>
     </div>
   </div>
 </section>
@@ -526,7 +620,7 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
   <div class="status-strip-inner">
     <span class="badge badge-green"><span class="bdot"></span>Ahead pace by 13.2h this month</span>
     <span class="badge badge-blue"><span class="bdot"></span>349.2 / 1,750 hrs year to date</span>
-    <span class="badge badge-orange"><span class="bdot"></span>Adj. daily target: 3.6h</span>
+    <span class="badge badge-amber"><span class="bdot"></span>Adj. daily target: 3.6h</span>
   </div>
 </div>
 
@@ -549,7 +643,7 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 
 <section class="features">
   <div class="features-header">
-    <div class="eyebrow"><span class="epip"></span>Features</div>
+    <div class="eyebrow"><svg class="ring-mark"><use href="#tenth-ring"/></svg>Features</div>
     <h2 class="section-title">Everything a billing lawyer<br>actually <em>needs.</em></h2>
   </div>
   <div class="features-grid">
@@ -590,34 +684,42 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
       <div class="feature-desc">Export all entries to CSV for reporting or archiving. Import past entries from a spreadsheet to get started mid-year.</div>
     </div>
   </div>
+  <div class="v2-strip">
+    <span class="v2-label"><svg class="ring-mark"><use href="#tenth-ring"/></svg>New in 2.0</span>
+    <div class="v2-items">
+      <span class="v2-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M4.5 10a5.5 5.5 0 0 0 11 0"/><line x1="10" y1="15.5" x2="10" y2="18"/></svg>Log time with Siri</span>
+      <span class="v2-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.5" stroke-dasharray="3.4 1.3"/><path d="M10 6.5V10l2.2 2.2"/></svg>Lock Screen widget with your day ring</span>
+      <span class="v2-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="12" height="9" rx="2"/><path d="M7 9V6a3 3 0 0 1 6 0v3"/></svg>Face ID app lock</span>
+    </div>
+  </div>
 </section>
 
 <section class="showcase">
   <div class="showcase-inner">
     <div class="showcase-header">
-      <div class="showcase-eyebrow"><span class="eyebrow-dot"></span>Inside the app</div>
+      <div class="showcase-eyebrow"><svg class="ring-mark"><use href="#tenth-ring"/></svg>Inside the app</div>
       <h2 class="showcase-title">Built to fit your <em>workflow.</em></h2>
     </div>
     <div class="screens-row">
       <div class="screen-item">
         <span class="screen-label">Dashboard</span>
-        <div class="screen-phone"><img src="screenshot_1_dashboard.png" alt="Dashboard showing YTD billable hours, daily targets, and monthly overview" width="1284" height="2778" loading="lazy" decoding="async"></div>
+        <div class="screen-phone"><img src="screenshot_1_dashboard.png" alt="Dashboard showing YTD billable hours, daily targets, and monthly overview" width="1206" height="2622" loading="lazy" decoding="async"></div>
       </div>
       <div class="screen-item">
         <span class="screen-label">Monthly view</span>
-        <div class="screen-phone"><img src="screenshot_2_monthly.png" alt="Monthly breakdown with day-by-day billable hours and variance tracking" width="1284" height="2778" loading="lazy" decoding="async"></div>
+        <div class="screen-phone"><img src="screenshot_2_monthly.png" alt="Monthly breakdown with day-by-day billable hours and variance tracking" width="1206" height="2622" loading="lazy" decoding="async"></div>
       </div>
       <div class="screen-item">
         <span class="screen-label">Add time</span>
-        <div class="screen-phone"><img src="screenshot_3_addtime.png" alt="Log billable or non-billable hours in 6-minute increments" width="1284" height="2778" loading="lazy" decoding="async"></div>
+        <div class="screen-phone"><img src="screenshot_3_addtime.png" alt="Log billable or non-billable hours in 6-minute increments" width="1206" height="2622" loading="lazy" decoding="async"></div>
       </div>
       <div class="screen-item">
         <span class="screen-label">Leave days</span>
-        <div class="screen-phone"><img src="screenshot_4_leave.png" alt="Schedule leave days to automatically adjust your daily targets" width="1284" height="2778" loading="lazy" decoding="async"></div>
+        <div class="screen-phone"><img src="screenshot_4_leave.png" alt="Schedule leave days to automatically adjust your daily targets" width="1206" height="2622" loading="lazy" decoding="async"></div>
       </div>
       <div class="screen-item">
         <span class="screen-label">Settings</span>
-        <div class="screen-phone"><img src="screenshot_5_settings_top.png" alt="Set annual targets, location, and view statutory holidays" width="1284" height="2778" loading="lazy" decoding="async"></div>
+        <div class="screen-phone"><img src="screenshot_5_settings_top.png" alt="Set annual targets, location, and view statutory holidays" width="1206" height="2622" loading="lazy" decoding="async"></div>
       </div>
     </div>
   </div>
@@ -625,7 +727,7 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 
 <section class="privacy">
   <div>
-    <div class="eyebrow"><span class="epip"></span>Privacy</div>
+    <div class="eyebrow"><svg class="ring-mark"><use href="#tenth-ring"/></svg>Privacy</div>
     <h2 class="privacy-title">Designed for <em>confidentiality.</em></h2>
     <p class="privacy-text">OneTenth tracks only hours and billing status — no client names, matter descriptions, or identifying information are ever recorded. Your billing data is anonymized by design.</p>
     <p class="privacy-text">No accounts. No servers. No analytics. All data lives on your device. If iCloud Backup is enabled in iOS Settings, your data is included in Apple's encrypted device backup — managed entirely by Apple.</p>
@@ -676,20 +778,20 @@ footer { padding: 26px 52px; border-top: 1px solid var(--rule); background: var(
 <section class="cta-wrap">
   <div class="cta-box">
     <div class="cta-icon">
-      <div class="cta-app-icon"><img src="app-icon-small.png" alt="OneTenth" width="1024" height="1024" loading="lazy" decoding="async"></div>
+      <div class="cta-app-icon"><img src="app-icon.png" alt="OneTenth" width="1024" height="1024" loading="lazy" decoding="async"></div>
     </div>
     <h2 class="cta-title">Start tracking <em>today.</em></h2>
     <p class="cta-sub">No subscription. No account needed. Open the app and start logging your hours.</p>
     <a href="https://apps.apple.com/ca/app/onetenth/id6761038270" target="_blank" rel="noopener" class="app-store-badge app-store-badge--cta" aria-label="Download OneTenth on the App Store">
       <img src="app-store-badge.svg" alt="Download on the App Store" width="200" height="67" loading="lazy">
     </a>
-    <p class="cta-footnote">Available for iPhone and iPad · iOS 16+</p>
+    <p class="cta-footnote">Available for iPhone · iOS 26+</p>
   </div>
 </section>
 
 <footer>
   <div class="footer-left">
-    <div class="footer-icon"><img src="app-icon-small.png" alt="OneTenth" width="1024" height="1024" loading="lazy" decoding="async"></div>
+    <div class="footer-icon"><img src="app-icon.png" alt="OneTenth" width="1024" height="1024" loading="lazy" decoding="async"></div>
     <div class="footer-meta">
       <span class="footer-copy">&copy; 2026 OneTenth. All rights reserved.</span>
       <span class="footer-byline">Built in Vancouver by a practicing BC lawyer.</span>
